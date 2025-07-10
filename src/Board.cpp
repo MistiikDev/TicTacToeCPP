@@ -26,16 +26,22 @@ short int Board::getPlayerPosition() {
         std::cout << "Enter desired grid position: " << std::endl;
         std::cin >> desiredPosition;
 
-    } while (b_canUserPlayerMove(desiredPosition));
+    } while (b_canUserMove(desiredPosition));
 
     return desiredPosition;
 }
 
 short int Board::getComputerPosition() {
-    return rand() % getSize();
+    short int desiredPosition = -1;
+    do {
+        desiredPosition = rand() % getSize(); // This will yield indefinitely once the grid is full. TODO. Check instead "free" slots inside the grid to choose from.
+
+    } while (b_canUserMove(desiredPosition));
+
+    return desiredPosition;
 }
 
-bool Board::b_canUserPlayerMove(short int desiredPosition) {
+bool Board::b_canUserMove(short int desiredPosition) {
     if (desiredPosition != -1 && desiredPosition >= 0 && desiredPosition <= getSize()) {
         return map[desiredPosition] == ' '; 
     }

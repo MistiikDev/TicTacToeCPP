@@ -29,7 +29,7 @@ class Board {
         virtual short int getComputerPosition();
 
 
-        virtual bool b_canUserPlayerMove(short int desiredPosition);
+        virtual bool b_canUserMove(short int desiredPosition);
 
 
         virtual void displayBoard();
