@@ -2,6 +2,10 @@
 #include <Game.h>
 #include <ctime>
 
+Game::Game(std::string& GameTitle) {
+    Game::gameTitle = GameTitle;
+}
+
 void Game::startGame(char* players) {
     Game::winner = UserType::null;
     Game::b_isGameOver = false;

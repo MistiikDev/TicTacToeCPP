@@ -1,6 +1,18 @@
 #include <iostream>
 #include <Board.h>
 
+// Constructor
+Board::Board(int length)  
+{
+    boardLength = length;
+    map = new char[length * length];
+
+    for (int i = 0; i < length * length; i++) {
+        map[i] = ' ';
+    }
+};
+
+// Implementations
 unsigned int Board::getSize()
 {
     return boardLength * boardLength;
@@ -62,7 +74,7 @@ char Board::getUserSkin(UserType user) {
 
         default: return '+';
     }
-    
+
     return '/';
 }
 std::string Board::getUsername(UserType user) {
