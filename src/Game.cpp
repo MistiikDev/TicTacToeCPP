@@ -3,43 +3,42 @@
 #include <ctime>
 
 void Game::startGame(char* players) {
-    Game::winner = '/';
+    Game::winner = UserType::null;
     Game::b_isGameOver = false;
     Game::players = players;
 
     std::cout << "Welcome to " << Game::gameTitle << std::endl;
 
-    Game::map = new Board(3);
+    Game::map = new Board(3); // hard coded for now.
 
     while (!Game::b_isGameOver) {
-        Game::playerTurn();
-        Game::computerTurn();
+        Game::userTurn(UserType::player);
+        Game::userTurn(UserType::computer);
 
         Game::map->displayBoard();
         Game::map->checkWinner();
     }
 }
 
-void Game::playerTurn() {
-    short int desiredPosition = Game::map->getPlayerPosition();
+void Game::userTurn(UserType user) {
+    short int desiredPosition = Game::map->getUserPosition(user);
    
-    Game::map->placeTurn(desiredPosition, UserType::player);
-}
+    if (desiredPosition == -1) { // No more slots left. Check win ?
+        UserType winner = Game::map->checkWinner();
+        Game::stopGame(winner);
 
-void Game::computerTurn() {
-    short int desiredPosition = Game::map->getComputerPosition();
-
-    if (Game::map->b_canUserPlayerMove(desiredPosition)) {
-        Game::map->placeTurn(desiredPosition, UserType::computer);
+        return;
     }
+
+    Game::map->placeTurn(desiredPosition, user);
 }
 
-void Game::stopGame(const char& winner) {
+void Game::stopGame(const UserType& winner) {
     Game::winner = winner;
     Game::b_isGameOver = true;
 
+    std::cout << "Winner is " << Game::map->getUsername(Game::winner) << std::endl;
+
     delete[] Game::players;
     delete[] Game::map;
-
-    std::cout << "Winner is " << Game::winner << std::endl;
 }

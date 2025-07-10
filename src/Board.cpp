@@ -19,24 +19,29 @@ void Board::displayBoard()
     }
 }
 
-short int Board::getPlayerPosition() {
+short int Board::getUserPosition(UserType user) {
     short int desiredPosition = -1;
+    
+    int remainingSlots = 0;
+    // Get remaining slots
+    for (int i = 0; i < getSize(); i++) {
+        if (map[i] == ' ') {
+            remainingSlots += 1;
+        } 
+    }
 
-    do {
-        std::cout << "Enter desired grid position: " << std::endl;
-        std::cin >> desiredPosition;
+    if (remainingSlots != 0) {
+        do {
+            if (user == UserType::player) {
+                std::cout << "Enter desired grid position: " << std::endl;
+                std::cin >> desiredPosition;
 
-    } while (b_canUserMove(desiredPosition));
+            } else if (user == UserType::computer) {
+                desiredPosition = rand() % getSize();
+            }
 
-    return desiredPosition;
-}
-
-short int Board::getComputerPosition() {
-    short int desiredPosition = -1;
-    do {
-        desiredPosition = rand() % getSize(); // This will yield indefinitely once the grid is full. TODO. Check instead "free" slots inside the grid to choose from.
-
-    } while (b_canUserMove(desiredPosition));
+        } while (!b_canUserMove(desiredPosition));
+    }
 
     return desiredPosition;
 }
@@ -49,22 +54,38 @@ bool Board::b_canUserMove(short int desiredPosition) {
     return false;
 }
 
-char Board::getUserPawn(UserType user) {
-    if (user == UserType::player) {
-        return 'x';
-    } else if (user == UserType::computer) {
-        return 'o';
-    }
+char Board::getUserSkin(UserType user) {
+    switch (user) {
+        case UserType::player: return Board::playerSkin;
+        case UserType::computer: return Board::computerSkin;
+        case UserType::null: return '/';
 
+        default: return '+';
+    }
+    
     return '/';
 }
+std::string Board::getUsername(UserType user) {
+    switch (user) {
+        case UserType::player: return "Player";
+        case UserType::computer: return "Computer";
+        case UserType::null: return "NULL";
+
+        default: return "VOID";
+    }
+}
+
 
 void Board::placeTurn(short int turnPosition, UserType user) {
-    map[turnPosition] = getUserPawn(user);
+    map[turnPosition] = getUserSkin(user);
 }
 
 UserType Board::checkWinner() {
-    return UserType::null;
+    Board::checkColumn();
+    Board::checkRow();
+    Board::checkDiagonalFull();
+
+    return UserType::player;
 }
 
 UserType Board::checkRow() {
