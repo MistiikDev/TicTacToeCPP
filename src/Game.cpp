@@ -5,6 +5,10 @@ Game::Game(std::string& GameTitle) {
     Game::gameTitle = GameTitle;
 }
 
+Game::~Game() {
+    delete[] Game::map;
+}
+
 void Game::startGame() {
     Game::winner = UserType::null;
     Game::b_isGameOver = false;
@@ -25,10 +29,10 @@ void Game::startGame() {
 void Game::userTurn(UserType user) {
     if (b_isGameOver) {return;}
 
-    UserType winner = Game::map->checkWinner();
+    UserType currentWinner = Game::map->checkWinner();
 
-    if (winner != UserType::null) {
-        Game::stopGame(winner);
+    if (currentWinner != UserType::null) {
+        Game::stopGame(currentWinner);
         
         return;
     };
@@ -39,12 +43,17 @@ void Game::userTurn(UserType user) {
 }
 
 void Game::stopGame(const UserType& winner) {
-    Game::map->displayBoard();
-
     Game::winner = winner;
     Game::b_isGameOver = true;
 
-    std::cout << "Winner is " << Game::map->getUsername(Game::winner) << std::endl;
+    Game::map->displayBoard();
+    std::cout << std::endl;
     
+    if (winner == UserType::both) {
+        std::cout << "Tie! No one wins." << std::endl;
+    } else {
+        std::cout <<  Game::map->getUsername(Game::winner) << " wins the game!" << std::endl;
+    }
+
     delete[] Game::map;
 }

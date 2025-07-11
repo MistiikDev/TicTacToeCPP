@@ -4,8 +4,8 @@
 enum UserType {
     player,
     computer,
+    both,
     null,
-    tie
 };
 
 class Board {
@@ -18,12 +18,10 @@ class Board {
 
         unsigned int boardLength {};
         unsigned int boardArea {};
+
         virtual short int getUserPosition(UserType user);
-
         virtual bool b_canUserMove(short int desiredPosition);
-
         virtual void displayBoard();
-        virtual UserType checkWinner();
         
         unsigned int getRemainingSlots() {
             unsigned int remainingSlots = 0;
@@ -48,6 +46,15 @@ class Board {
             return '/';
         }
 
+        std::string getUsername(UserType user) {
+            switch (user) {
+                case UserType::player: return "Player";
+                case UserType::computer: return "Computer";
+                case UserType::null: return "NULL";
+
+                default: return "VOID";
+            }
+        }
 
         UserType getUserFromCharacter(char& character) {
             if (character == Board::playerSkin) {
@@ -59,23 +66,13 @@ class Board {
             return UserType::null;
         }
 
-        std::string getUsername(UserType user) {
-            switch (user) {
-                case UserType::player: return "Player";
-                case UserType::computer: return "Computer";
-                case UserType::null: return "NULL";
-
-                default: return "VOID";
-            }
-        }
+        virtual UserType checkWinner();
 
         void placeTurn(short int turnPosition, UserType user) {
             Board::map[turnPosition] = Board::getUserCharacter(user);
         }
 
-        ~Board() {
-            delete[] map;
-        }
+        ~Board();
 
     private:
         virtual UserType checkDiagonalFull();

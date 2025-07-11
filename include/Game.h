@@ -4,6 +4,14 @@
 #include <iostream>
 #include <Board.h>
 
+struct User {
+    std::string name;
+    
+    char character;
+    int numberOfWins;
+    bool b_isComputer;
+};
+
 class Game {
     public: 
         Game(std::string& GameTitle);
@@ -18,9 +26,7 @@ class Game {
         virtual void userTurn(UserType user);
         virtual void stopGame(const UserType& winner);
 
-        ~Game() {
-            delete[] map;
-        }
+        ~Game();
 };
 
 #endif 

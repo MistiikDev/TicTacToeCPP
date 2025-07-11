@@ -16,6 +16,10 @@ Board::Board(unsigned int length)
     }
 };
 
+Board::~Board() {
+    delete[] Board::map;
+}
+
 // Implementations
 void Board::displayBoard() {
     for (int i = 0; i < Board::boardArea; i++) {
@@ -29,13 +33,12 @@ void Board::displayBoard() {
 
 short int Board::getUserPosition(UserType user) {
     short int desiredPosition = -1;
-    
     unsigned int remainingSlots = Board::getRemainingSlots();
 
     if (remainingSlots != 0) {
         do {
             if (user == UserType::player) {
-                std::cout << "Enter desired grid position: " << std::endl;
+                std::cout << "Enter desired grid position: (0-" << (Board::boardArea - 1) << "):";
                 std::cin >> desiredPosition;
 
             } else if (user == UserType::computer) {
@@ -59,19 +62,21 @@ bool Board::b_canUserMove(short int desiredPosition) {
 UserType Board::checkWinner() {
     unsigned int remainingSlots = Board::getRemainingSlots();
 
-    if (remainingSlots == 0) {
-        return UserType::tie;
+    UserType columnMajor = Board::checkColumn();
+    UserType rowMajor = Board::checkRow();
+    UserType diagMajor = Board::checkDiagonalFull();
+
+    if (rowMajor != UserType::null) {
+        return rowMajor;
+    } else if (columnMajor != UserType::null) {
+        return columnMajor;
     }
 
-    UserType c_winner; 
-    UserType r_winner;
-    UserType d_winner; 
-    
-    c_winner = Board::checkColumn();
-    r_winner = Board::checkRow();
-    d_winner = Board::checkDiagonalFull();
+    if (remainingSlots == 0) {
+        return UserType::both;
+    }
 
-    return r_winner;
+    return UserType::null;
 }
 
 UserType Board::checkRow() {
@@ -79,18 +84,18 @@ UserType Board::checkRow() {
     int occurences = 0;
 
     for (int i = 0; i < Board::boardArea; i += Board::boardLength) {
-        currentUserTake = map[i];
-        
-        for (int j = i; j < Board::boardLength; j++) {
-            if (Board::map[j] != currentUserTake) {
-                currentUserTake = ' ';
-                break;
-            }
+        currentUserTake = ' ';
+        occurences = 0;
 
-            occurences += 1;
-        }
+        for (int j = i; j < i + Board::boardLength; j++) {
+            if (map[j] == map[i]) {
+                occurences++;
+            }
+        } 
 
         if (occurences == Board::boardLength) {
+            currentUserTake = map[i];
+
             break;
         }
     }
@@ -99,7 +104,26 @@ UserType Board::checkRow() {
 }
 
 UserType Board::checkColumn() {
-    return UserType::null;
+    char currentUserTake = ' ';
+    int occurences = 0;
+
+    for (int i = 0; i < Board::boardLength; i++) {
+        currentUserTake = ' ';
+        occurences = 0;
+
+        for (int j = i; j < i + (Board::boardLength * 2) + 1; j += Board::boardLength) {
+            if (map[j] == map[i]) {
+                occurences++;
+            }
+        }
+
+        if (occurences == Board::boardLength) {
+            currentUserTake = map[i];
+            break;
+        }
+    }
+
+    return Board::getUserFromCharacter(currentUserTake);
 }
 
 UserType Board::checkDiagonalFull() {
