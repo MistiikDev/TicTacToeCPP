@@ -46,6 +46,7 @@ void Game::stopGame(const UserType& winner) {
     Game::winner = winner;
     Game::b_isGameOver = true;
 
+    std::cout << "************** GAME OVER **************" << std::endl;
     Game::map->displayBoard();
     std::cout << std::endl;
     

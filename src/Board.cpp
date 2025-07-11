@@ -70,6 +70,8 @@ UserType Board::checkWinner() {
         return rowMajor;
     } else if (columnMajor != UserType::null) {
         return columnMajor;
+    } else if (diagMajor != UserType::null) {
+        return diagMajor;
     }
 
     if (remainingSlots == 0) {
@@ -127,5 +129,39 @@ UserType Board::checkColumn() {
 }
 
 UserType Board::checkDiagonalFull() {
+    char currentUserTake = ' ';
+    int occurences = 0;
+
+    // Left Diagonal
+    for (int j = 0; j < Board::boardArea; j += Board::boardLength + 1) {
+        if (map[j] == map[0]) {
+            occurences++;
+        }
+    }
+
+    
+    if (occurences == Board::boardLength) {
+        currentUserTake = map[0];
+   
+        return Board::getUserFromCharacter(currentUserTake);
+    }
+
+    currentUserTake = ' ';
+    occurences = 0;
+
+    // Right Diagonal
+    for (int j = Board::boardLength - 1; j < (Board::boardArea - Board::boardLength) + 1; j += Board::boardLength - 1) {
+        if (map[j] == map[Board::boardLength - 1]) {
+            occurences++;
+        }
+    }
+
+    
+    if (occurences == Board::boardLength) {
+        currentUserTake = map[Board::boardLength - 1];
+                
+        return Board::getUserFromCharacter(currentUserTake);
+    }
+
     return UserType::null;
 }
