@@ -4,38 +4,74 @@
 enum UserType {
     player,
     computer,
-    null
+    null,
+    tie
 };
 
 class Board {
     public:
-        Board(int length) {
-            boardLength = length;
-            map = new char[length * length];
+        Board(unsigned int length);
 
-            for (int i = 0; i < length * length; i++) {
-                map[i] = ' ';
-            }
-        };
+        char* map {};
+        const char playerSkin = 'x';
+        const char computerSkin = 'o';
 
         unsigned int boardLength {};
-        char* map {};
-        
-        virtual char getUserPawn(UserType user);
-        virtual unsigned int getSize();
-
-        
-        virtual short int getPlayerPosition();
-        virtual short int getComputerPosition();
-
+        unsigned int boardArea {};
+        virtual short int getUserPosition(UserType user);
 
         virtual bool b_canUserMove(short int desiredPosition);
 
-
         virtual void displayBoard();
-        virtual void placeTurn(short int turnPosition, UserType user);
-
         virtual UserType checkWinner();
+        
+        unsigned int getRemainingSlots() {
+            unsigned int remainingSlots = 0;
+            for (int i = 0; i < Board::boardArea; i++) {
+                if (Board::map[i] == ' ') {
+                    remainingSlots += 1;
+                } 
+            }
+
+            return remainingSlots;
+        }
+
+        char getUserCharacter(UserType user) {
+            switch (user) {
+                case UserType::player: return Board::playerSkin;
+                case UserType::computer: return Board::computerSkin;
+                case UserType::null: return '/';
+
+                default: return '+';
+            }
+
+            return '/';
+        }
+
+
+        UserType getUserFromCharacter(char& character) {
+            if (character == Board::playerSkin) {
+                return UserType::player;
+            } else if (character == Board::computerSkin) {
+                return UserType::computer;
+            }
+
+            return UserType::null;
+        }
+
+        std::string getUsername(UserType user) {
+            switch (user) {
+                case UserType::player: return "Player";
+                case UserType::computer: return "Computer";
+                case UserType::null: return "NULL";
+
+                default: return "VOID";
+            }
+        }
+
+        void placeTurn(short int turnPosition, UserType user) {
+            Board::map[turnPosition] = Board::getUserCharacter(user);
+        }
 
         ~Board() {
             delete[] map;
@@ -46,5 +82,7 @@ class Board {
         virtual UserType checkRow();
         virtual UserType checkColumn();
 };
+
+
 
 #endif

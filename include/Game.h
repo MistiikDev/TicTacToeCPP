@@ -6,28 +6,20 @@
 
 class Game {
     public: 
+        Game(std::string& GameTitle);
+        
         std::string gameTitle;
-
-        Game(std::string& GameTitle) {
-            gameTitle = GameTitle;
-        }
-
         bool b_isGameOver;
         
+        UserType winner;
         Board* map;
-        char winner;
-        char* players;
 
-        virtual void startGame(char* players);
-        
-        virtual void playerTurn();
-        virtual void computerTurn();
-
-        virtual void stopGame(const char& winner);
+        virtual void startGame();
+        virtual void userTurn(UserType user);
+        virtual void stopGame(const UserType& winner);
 
         ~Game() {
             delete[] map;
-            delete[] players;
         }
 };
 

@@ -1,10 +1,14 @@
 #include <iostream>
 #include <Board.h>
+#include <ctime>
 
 // Constructor
-Board::Board(int length)  
+Board::Board(unsigned int length)  
 {
+    srand(time(NULL));
     boardLength = length;
+    boardArea = length * length ;
+
     map = new char[length * length];
 
     for (int i = 0; i < length * length; i++) {
@@ -13,19 +17,11 @@ Board::Board(int length)
 };
 
 // Implementations
-unsigned int Board::getSize()
-{
-    return boardLength * boardLength;
-}
+void Board::displayBoard() {
+    for (int i = 0; i < Board::boardArea; i++) {
+        std::cout << "| " << Board::map[i] << " |";
 
-void Board::displayBoard()
-{
-    for (int i = 0; i < getSize(); i++)
-    {
-        std::cout << "| " << map[i] << " |";
-
-        if (i != 0 && (i + 1) % boardLength == 0)
-        {
+        if (i != 0 && (i + 1) % Board::boardLength == 0) {
             std::cout << std::endl;
         }
     }
@@ -34,13 +30,7 @@ void Board::displayBoard()
 short int Board::getUserPosition(UserType user) {
     short int desiredPosition = -1;
     
-    int remainingSlots = 0;
-    // Get remaining slots
-    for (int i = 0; i < getSize(); i++) {
-        if (map[i] == ' ') {
-            remainingSlots += 1;
-        } 
-    }
+    unsigned int remainingSlots = Board::getRemainingSlots();
 
     if (remainingSlots != 0) {
         do {
@@ -49,59 +39,63 @@ short int Board::getUserPosition(UserType user) {
                 std::cin >> desiredPosition;
 
             } else if (user == UserType::computer) {
-                desiredPosition = rand() % getSize();
+                desiredPosition = rand() % Board::boardArea;
             }
 
-        } while (!b_canUserMove(desiredPosition));
+        } while (!Board::b_canUserMove(desiredPosition));
     }
 
     return desiredPosition;
 }
 
 bool Board::b_canUserMove(short int desiredPosition) {
-    if (desiredPosition != -1 && desiredPosition >= 0 && desiredPosition <= getSize()) {
-        return map[desiredPosition] == ' '; 
+    if (desiredPosition != -1 && desiredPosition >= 0 && desiredPosition <= Board::boardArea) {
+        return Board::map[desiredPosition] == ' '; 
     }
 
     return false;
 }
 
-char Board::getUserSkin(UserType user) {
-    switch (user) {
-        case UserType::player: return Board::playerSkin;
-        case UserType::computer: return Board::computerSkin;
-        case UserType::null: return '/';
-
-        default: return '+';
-    }
-
-    return '/';
-}
-std::string Board::getUsername(UserType user) {
-    switch (user) {
-        case UserType::player: return "Player";
-        case UserType::computer: return "Computer";
-        case UserType::null: return "NULL";
-
-        default: return "VOID";
-    }
-}
-
-
-void Board::placeTurn(short int turnPosition, UserType user) {
-    map[turnPosition] = getUserSkin(user);
-}
-
 UserType Board::checkWinner() {
-    Board::checkColumn();
-    Board::checkRow();
-    Board::checkDiagonalFull();
+    unsigned int remainingSlots = Board::getRemainingSlots();
 
-    return UserType::player;
+    if (remainingSlots == 0) {
+        return UserType::tie;
+    }
+
+    UserType c_winner; 
+    UserType r_winner;
+    UserType d_winner; 
+    
+    c_winner = Board::checkColumn();
+    r_winner = Board::checkRow();
+    d_winner = Board::checkDiagonalFull();
+
+    return r_winner;
 }
 
 UserType Board::checkRow() {
-    return UserType::null;
+    char currentUserTake = ' ';
+    int occurences = 0;
+
+    for (int i = 0; i < Board::boardArea; i += Board::boardLength) {
+        currentUserTake = map[i];
+        
+        for (int j = i; j < Board::boardLength; j++) {
+            if (Board::map[j] != currentUserTake) {
+                currentUserTake = ' ';
+                break;
+            }
+
+            occurences += 1;
+        }
+
+        if (occurences == Board::boardLength) {
+            break;
+        }
+    }
+
+    return Board::getUserFromCharacter(currentUserTake);
 }
 
 UserType Board::checkColumn() {

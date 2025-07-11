@@ -1,6 +1,5 @@
 #include <iostream>
 #include <Game.h>
-#include <ctime>
 
 Game::Game(std::string& GameTitle) {
     Game::gameTitle = GameTitle;
@@ -20,24 +19,28 @@ void Game::startGame() {
         Game::userTurn(UserType::computer);
 
         Game::map->displayBoard();
-        Game::map->checkWinner();
     }
 }
 
 void Game::userTurn(UserType user) {
-    short int desiredPosition = Game::map->getUserPosition(user);
-   
-    if (desiredPosition == -1) { // No more slots left. Check win ?
-        UserType winner = Game::map->checkWinner();
-        Game::stopGame(winner);
+    if (b_isGameOver) {return;}
 
+    UserType winner = Game::map->checkWinner();
+
+    if (winner != UserType::null) {
+        Game::stopGame(winner);
+        
         return;
-    }
+    };
+
+    short int desiredPosition = Game::map->getUserPosition(user);
 
     Game::map->placeTurn(desiredPosition, user);
 }
 
 void Game::stopGame(const UserType& winner) {
+    Game::map->displayBoard();
+
     Game::winner = winner;
     Game::b_isGameOver = true;
 
