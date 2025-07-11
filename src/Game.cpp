@@ -6,15 +6,15 @@ Game::Game(std::string& GameTitle) {
     Game::gameTitle = GameTitle;
 }
 
-void Game::startGame(char* players) {
+void Game::startGame() {
     Game::winner = UserType::null;
     Game::b_isGameOver = false;
-    Game::players = players;
 
     std::cout << "Welcome to " << Game::gameTitle << std::endl;
 
     Game::map = new Board(3); // hard coded for now.
-
+    Game::map->displayBoard();
+    
     while (!Game::b_isGameOver) {
         Game::userTurn(UserType::player);
         Game::userTurn(UserType::computer);
@@ -42,7 +42,6 @@ void Game::stopGame(const UserType& winner) {
     Game::b_isGameOver = true;
 
     std::cout << "Winner is " << Game::map->getUsername(Game::winner) << std::endl;
-
-    delete[] Game::players;
+    
     delete[] Game::map;
 }
