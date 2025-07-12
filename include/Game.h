@@ -3,9 +3,10 @@
 
 #include <iostream>
 #include <Board.h>
+#include <Player.h>
 
 struct User {
-    std::string name;
+    std::string username;
     
     char character;
     int numberOfWins;
@@ -18,7 +19,8 @@ class Game {
         
         std::string gameTitle;
         bool b_isGameOver;
-        
+
+        Player* players;
         UserType winner;
         Board* map;
 
