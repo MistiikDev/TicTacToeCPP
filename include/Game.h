@@ -5,12 +5,11 @@
 #include <Board.h>
 #include <Player.h>
 
-struct User {
-    std::string username;
-    
-    char character;
-    int numberOfWins;
-    bool b_isComputer;
+enum Outcome {
+    PlayerWin,
+    ComputerWin, 
+    Tie,
+    Null,
 };
 
 class Game {
@@ -19,14 +18,15 @@ class Game {
         
         std::string gameTitle;
         bool b_isGameOver;
+        int playerCount; 
 
+        Player winner;
         Player* players;
-        UserType winner;
         Board* map;
 
-        virtual void startGame();
-        virtual void userTurn(UserType user);
-        virtual void stopGame(const UserType& winner);
+        virtual void startGame(Player* players, int playerCount);
+        virtual void userTurn(Player& player);
+        virtual void stopGame(Outcome outcome, Player& winner);
 
         ~Game();
 };

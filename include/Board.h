@@ -1,16 +1,42 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-enum UserType {
-    player,
-    computer,
-    both,
-    null,
-};
+#include <Player.h>
 
 class Board {
     public:
-        Board(unsigned int length);
+        static bool b_canPlayerMove(char* map, short int mapArea, short int desiredPosition) {
+            if (desiredPosition != -1 && desiredPosition >= 0 && desiredPosition <= mapArea) {
+                return map[desiredPosition] == ' '; 
+            }
+
+            return false;
+        }
+
+        static unsigned int getRemainingSlots(char* map, int mapArea) {
+            unsigned int remainingSlots = 0;
+
+            for (int i = 0; i < mapArea; i++) {
+                if (map[i] == ' ') {
+                    remainingSlots += 1;
+                } 
+            }
+
+            return remainingSlots;
+        }
+
+        static void displayBoard(char* map, int boardLength, int boardArea) {
+            for (int i = 0; i < boardArea; i++) {
+                std::cout << "| " << map[i] << " |";
+
+                if (i != 0 && (i + 1) % boardLength == 0) {
+                    std::cout << std::endl;
+                }
+            }
+        }
+
+        Game* currentGameInstance;
+        Player dominantPlayer;
 
         char* map {};
         const char playerSkin = 'x';
@@ -19,65 +45,101 @@ class Board {
         unsigned int boardLength {};
         unsigned int boardArea {};
 
-        virtual short int getUserPosition(UserType user);
-        virtual bool b_canUserMove(short int desiredPosition);
+        virtual short int getPlayerPosition(Player& player);
         virtual void displayBoard();
-        
-        unsigned int getRemainingSlots() {
-            unsigned int remainingSlots = 0;
-            for (int i = 0; i < Board::boardArea; i++) {
-                if (Board::map[i] == ' ') {
-                    remainingSlots += 1;
+
+        virtual Outcome checkWinner();
+
+        void placeTurn(short int turnPosition, Player& player) {
+            Board::map[turnPosition] = player.userCharacter;
+        }
+
+        Player getDominantRowPlayer(char* map, int mapLength, int mapArea) {
+            char currentUserTake = ' ';
+            int occurences = 0;
+
+            for (int i = 0; i < mapArea; i += mapArea) {
+                currentUserTake = ' ';
+                occurences = 0;
+
+                for (int j = i; j < i + mapLength; j++) {
+                    if (map[j] == map[i]) {
+                        occurences++;
+                    }
                 } 
+
+                if (occurences == mapLength) {
+                    currentUserTake = map[i];
+
+                    break;
+                }
             }
 
-            return remainingSlots;
+            return Player::getPlayerFromCharacter(currentGameInstance->players, currentUserTake, currentGameInstance->playerCount);
         }
 
-        char getUserCharacter(UserType user) {
-            switch (user) {
-                case UserType::player: return Board::playerSkin;
-                case UserType::computer: return Board::computerSkin;
-                case UserType::null: return '/';
+        Player getDominantColumnPlayer(char* map, int mapLength) {
+            char currentUserTake = ' ';
+            int occurences = 0;
 
-                default: return '+';
+            for (int i = 0; i < mapLength; i++) {
+                currentUserTake = ' ';
+                occurences = 0;
+
+                for (int j = i; j < i + (mapLength * 2) + 1; j += mapLength) {
+                    if (map[j] == map[i]) {
+                        occurences++;
+                    }
+                }
+
+                if (occurences == mapLength) {
+                    currentUserTake = map[i];
+                    break;
+                }
             }
 
-            return '/';
+            return Player::getPlayerFromCharacter(currentGameInstance->players, currentUserTake, currentGameInstance->playerCount);
         }
 
-        std::string getUsername(UserType user) {
-            switch (user) {
-                case UserType::player: return "Player";
-                case UserType::computer: return "Computer";
-                case UserType::null: return "NULL";
+        Player getDominantDiagonalPlayer(char* map, int mapLength, int mapArea) {
+            char currentUserTake = ' ';
+            int occurences = 0;
 
-                default: return "VOID";
-            }
-        }
-
-        UserType getUserFromCharacter(char& character) {
-            if (character == Board::playerSkin) {
-                return UserType::player;
-            } else if (character == Board::computerSkin) {
-                return UserType::computer;
+            // Left Diagonal
+            for (int j = 0; j < mapArea; j += mapLength + 1) {
+                if (map[j] == map[0]) {
+                    occurences++;
+                }
             }
 
-            return UserType::null;
+            
+            if (occurences == mapLength) {
+                currentUserTake = map[0];
+        
+                return Player::getPlayerFromCharacter(currentGameInstance->players, currentUserTake, currentGameInstance->playerCount);
+            }
+
+            currentUserTake = ' ';
+            occurences = 0;
+
+            // Right Diagonal
+            for (int j = mapLength - 1; j < (mapArea - mapLength) + 1; j += mapLength - 1) {
+                if (map[j] == map[mapLength - 1]) {
+                    occurences++;
+                }
+            }
+
+            if (occurences == mapLength) {
+                currentUserTake = map[mapLength - 1];
+                        
+                return Player::getPlayerFromCharacter(currentGameInstance->players, currentUserTake, currentGameInstance->playerCount);
+            }
+
+            return Player::NullPlayer;
         }
 
-        virtual UserType checkWinner();
-
-        void placeTurn(short int turnPosition, UserType user) {
-            Board::map[turnPosition] = Board::getUserCharacter(user);
-        }
-
+        Board(Game* game, unsigned int length);
         ~Board();
-
-    private:
-        virtual UserType checkDiagonalFull();
-        virtual UserType checkRow();
-        virtual UserType checkColumn();
 };
 
 
