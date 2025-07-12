@@ -12,17 +12,17 @@ Game::~Game() {
 void Game::startGame() {
     Game::winner = UserType::null;
     Game::b_isGameOver = false;
+    Game::map = new Board(3);
 
     std::cout << "Welcome to " << Game::gameTitle << std::endl;
 
     Game::map = new Board(3); // hard coded for now.
-    Game::map->displayBoard();
     
     while (!Game::b_isGameOver) {
+        Game::map->displayBoard();
+
         Game::userTurn(UserType::player);
         Game::userTurn(UserType::computer);
-
-        Game::map->displayBoard();
     }
 }
 
@@ -47,7 +47,6 @@ void Game::stopGame(const UserType& winner) {
     Game::b_isGameOver = true;
 
     std::cout << "************** GAME OVER **************" << std::endl;
-    Game::map->displayBoard();
     std::cout << std::endl;
     
     if (winner == UserType::both) {
@@ -55,6 +54,4 @@ void Game::stopGame(const UserType& winner) {
     } else {
         std::cout <<  Game::map->getUsername(Game::winner) << " wins the game!" << std::endl;
     }
-
-    delete[] Game::map;
 }
